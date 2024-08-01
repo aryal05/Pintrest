@@ -9,11 +9,15 @@ const localStrategy = require("passport-local");
 passport.use(new localStrategy(userModel.authenticate()));
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
+router.get('/personal', isLoggedIn ,async function(req, res, next) {
+  const user = await userModel.findOne({username:req.session.passport.user})
+  res.render('personal',{user});
+});
+router.get('/info', function(req, res, next) {
   res.render('index');
 });
 router.get('/login', function(req, res, next) {
-  res.render('login');
+  res.render('login', {error: req.flash('error')});
 });
 router.get('/about', function(req, res, next) {
   res.render('about');
@@ -46,13 +50,15 @@ router.post('/register', function(req, res) {
 
 router.post('/login', passport.authenticate("local", {
   successRedirect: "/profile",
-  failureRedirect: '/'
+  failureRedirect: '/login',
+  failureFlash: true
 }));
 
 router.get('/logout', function(req, res, next) {
   req.logout(function(err) {
     if (err) { return next(err); }
     res.redirect('/');
+    
   });
 });
 
