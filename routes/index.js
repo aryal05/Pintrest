@@ -9,12 +9,12 @@ const localStrategy = require("passport-local");
 passport.use(new localStrategy(userModel.authenticate()));
 
 /* GET home page. */
+router.get('/', function(req, res, next) {
+  res.render('index');
+});
 router.get('/personal', isLoggedIn ,async function(req, res, next) {
   const user = await userModel.findOne({username:req.session.passport.user})
   res.render('personal',{user});
-});
-router.get('/info', function(req, res, next) {
-  res.render('index');
 });
 router.get('/login', function(req, res, next) {
   res.render('login', {error: req.flash('error')});
